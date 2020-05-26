@@ -1,0 +1,60 @@
+import React, { Component } from "react";
+import axios from "axios";
+export default class Login extends Component {
+  state = {
+    email: null,
+    password: null,
+    error: null,
+    loading: false,
+  };
+  handleType = (e) => {
+    const { name, value } = e.target;
+    this.setState({ [name]: value, error: null });
+  };
+  handleClick = () => {
+    axios
+      .post("http://localhost:8000/api/v1/users/login", {
+        email: this.state.email,
+        password: this.state.password,
+      })
+      .then((result) => {
+        this.props.onLogin(result.data.token);
+      })
+      .catch((err) => {
+        console.log(this.setState({ error: err.response.data.error.message })); // error.response обьект нь алдааны дэлгэрэнгүйг харуулна
+      });
+  };
+  render() {
+    return (
+      <div>
+        {this.state.error && (
+          <div className="notification is-warning">{this.state.error}</div>
+        )}
+        {this.state.error}
+        {this.state.email}
+        <div className="field">
+          <label className="label">имейл</label>
+          <input
+            className="input"
+            name="email"
+            type="text"
+            onChange={this.handleType}
+          />
+          <label className="label">нууц үг</label>
+          {this.state.password}
+          <input
+            className="input"
+            name="password"
+            type="password"
+            onChange={this.handleType}
+          />
+          <div className="field">
+            <button className="button is-link" onClick={this.handleClick}>
+              Нэвтрэх
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
