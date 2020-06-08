@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
+import Spinner from "./Spinner";
 export default class Books extends Component {
   state = {
     error: null,
@@ -24,7 +24,7 @@ export default class Books extends Component {
       <div>
         <h1 className="title">Амазон номын дэлгүүр</h1>
         {this.state.loading ? (
-          <div>Түр хүлээнэ үү...</div>
+          <Spinner />
         ) : (
           <div className="columns is-multiline">
             {this.state.books.map((el) => (

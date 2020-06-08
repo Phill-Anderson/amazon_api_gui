@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-
+import Spinner from "./Spinner";
 export default class Login extends Component {
   state = {
     email: null,
@@ -16,16 +16,21 @@ export default class Login extends Component {
   };
 
   handleClick = () => {
+    this.setState({ loading: true });
     axios
       .post("http://localhost:8000/api/v1/users/login", {
         email: this.state.email,
         password: this.state.password,
       })
       .then((result) => {
+        this.setState({ loading: false });
         this.props.onLogin(result.data.token);
       })
       .catch((err) =>
-        this.setState({ error: err.response.data.error.message })
+        this.setState({
+          error: err.response.data.error.message,
+          loading: false,
+        })
       );
   };
 
@@ -35,6 +40,7 @@ export default class Login extends Component {
         {this.state.error && (
           <div className="notification is-warning">{this.state.error}</div>
         )}
+        {this.state.loading && <Spinner />}
         <div className="field">
           <label className="label">Имэйл</label>
           <input

@@ -5,7 +5,6 @@ import Login from "./Login";
 import Books from "./Books";
 import BookDetail from "./BookDetail";
 import NavBar from "./Navbar";
-
 export default class App extends Component {
   state = {
     token: null,
@@ -26,7 +25,6 @@ export default class App extends Component {
   render() {
     return (
       <Router ref={(router) => (this.router = router)}>
-        {" "}
         {/* this.router гэж ашиглахын тулд ref ашигласан */}
         <NavBar onLogout={this.handleLogout} />
         <div className="container">
