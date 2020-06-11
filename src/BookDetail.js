@@ -8,32 +8,114 @@ export default class BookDetail extends Component {
     content: null,
     photo: null,
     error: null,
+    success: null,
+    deleted: null,
     loading: false,
   };
-  handleType = (e) => {
-    const { name, value } = e.target;
-    this.setState({ [name]: value, error: null });
-  };
+
   goBack = () => {
     this.props.history.goBack();
   };
+
+  handleType = (e) => {
+    const { name, value } = e.target;
+
+    this.setState({ [name]: value, error: null, success: null });
+  };
+
   componentDidMount = () => {
     this.setState({ loading: true });
     axios
-      .get(`http://localhost:8000/api/v1/books/${this.props.match.params.id}`)
-      .then((result) => this.setState({ ...result.data.data, loading: false }))
-      .catch((err) =>
+      .get("http://localhost:8000/api/v1/books/" + this.props.match.params.id)
+      .then((result) =>
+        this.setState({ ...result.data.data, error: null, loading: false })
+      )
+      .catch((err) => {
         this.setState({
           error: err.response.data.error.message,
           loading: false,
-        })
-      );
+        });
+      });
   };
+
+  handleSave = () => {
+    const token = localStorage.getItem("token");
+    this.setState({ loading: true, success: null });
+    axios
+      .put(
+        "http://localhost:8000/api/v1/books/" + this.props.match.params.id,
+        {
+          name: this.state.name,
+          price: this.state.price,
+          content: this.state.content,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((result) => {
+        this.setState({
+          ...result.data.data,
+          error: null,
+          loading: false,
+          success: "Амжилттай хадгалагдлаа...",
+        });
+      })
+      .catch((err) => {
+        this.setState({
+          error: err.response.data.error.message,
+          loading: false,
+        });
+      });
+  };
+
+  handleDelete = () => {
+    const token = localStorage.getItem("token");
+    this.setState({ loading: true, success: null });
+    axios
+      .delete(
+        "http://localhost:8000/api/v1/books/" + this.props.match.params.id,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((result) => {
+        this.setState({
+          deleted: true,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        this.setState({
+          error: err.response.data.error.message,
+          loading: false,
+        });
+      });
+  };
+
   render() {
-    if (this.state.error)
-      return <div className="notification is-warning">{this.state.error}</div>;
+    if (this.state.deleted) {
+      return (
+        <div className="notification is-danger">
+          Ном амжилттай устгагдлаа...
+        </div>
+      );
+    }
+
     return (
       <>
+        {this.state.error && (
+          <div className="notification is-warning">{this.state.error}</div>
+        )}
+
+        {this.state.success && (
+          <div className="notification is-success">{this.state.success}</div>
+        )}
+
         <h1 className="title">{this.state.name}</h1>
         <div className="media">
           <div className="media-left">
@@ -51,6 +133,7 @@ export default class BookDetail extends Component {
                 onChange={this.handleType}
               />
             </div>
+
             <div className="field">
               <label className="label">Үнэ</label>
               <input
@@ -60,8 +143,9 @@ export default class BookDetail extends Component {
                 onChange={this.handleType}
               />
             </div>
+
             <div className="field">
-              <label className="label">Тайлбар</label>
+              <label className="label">Агуулга</label>
               <textarea
                 style={{ height: "20em" }}
                 className="input"
@@ -70,12 +154,19 @@ export default class BookDetail extends Component {
                 onChange={this.handleType}
               />
             </div>
+
             <div className="field">
               <button className="button is-success" onClick={this.goBack}>
                 Буцах
               </button>
-              <button className="button is-link">Хадгалах</button>
-              <button className="button is-danger">Устгах</button>
+              &nbsp;
+              <button className="button is-link" onClick={this.handleSave}>
+                Хадгалах
+              </button>
+              &nbsp;
+              <button className="button is-danger" onClick={this.handleDelete}>
+                Устгах
+              </button>
             </div>
           </div>
         </div>

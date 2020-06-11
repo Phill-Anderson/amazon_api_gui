@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Spinner from "./Spinner";
+
 export default class Books extends Component {
   state = {
     error: null,
@@ -10,6 +11,8 @@ export default class Books extends Component {
   };
 
   componentDidMount = () => {
+    this.setState({ loading: true });
+
     this.setState({ loading: true });
     axios
       .get("http://localhost:8000/api/v1/books?limit=50")
